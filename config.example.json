@@ -1,0 +1,6 @@
+{
+  "multimc_instances_path": "C:/path/to/MultiMC/instances",
+  "java_path": "C:/path/to/jdk/bin/javaw.exe",
+  "world_source_dir": null,
+  "world_to_copy": "Test World"
+}

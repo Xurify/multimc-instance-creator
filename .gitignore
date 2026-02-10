@@ -1,0 +1,5 @@
+# World saves are large; ignore so repo stays small (remove this line to commit a world)
+templates/worlds/*/
+
+# User-specific paths and world name (copy from config.example.json; do not commit)
+config.json
