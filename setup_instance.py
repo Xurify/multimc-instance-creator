@@ -6,6 +6,8 @@ Automates creation of Minecraft instances with Fabric loader and mods from Modri
 
 import json
 import os
+import re
+import subprocess
 import sys
 import urllib.request
 import urllib.error
@@ -86,6 +88,41 @@ def get_latest_fabric_loader() -> str:
     return data[0]["version"]
 
 
+def validate_java_runtime(java_path: str, mc_version: str) -> None:
+    """Ensure the configured Java executable exists and supports the target Minecraft version."""
+    configured_java = Path(java_path)
+    console_java = configured_java.with_name("java.exe") if configured_java.name.lower() == "javaw.exe" else configured_java
+
+    if not configured_java.is_file() or not console_java.is_file():
+        print(f"Error: Java executable not found: {configured_java}")
+        sys.exit(1)
+
+    try:
+        result = subprocess.run(
+            [str(console_java), "-version"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            check=False,
+        )
+    except OSError as error:
+        print(f"Error: Could not run Java at {configured_java}: {error}")
+        sys.exit(1)
+
+    version_output = result.stderr or result.stdout
+    match = re.search(r'(?:java|openjdk) version "(\d+)', version_output, re.IGNORECASE)
+    if result.returncode != 0 or not match:
+        print(f"Error: Could not determine the Java version at {configured_java}")
+        sys.exit(1)
+
+    java_major = int(match.group(1))
+    if mc_version.startswith("26.") and java_major < 25:
+        print(f"Error: Minecraft {mc_version} requires Java 25 or newer; configured Java is {java_major}.")
+        sys.exit(1)
+
+    print(f"[OK] Using Java {java_major}")
+
+
 def get_modrinth_mod_version(mod_slug: str, mc_version: str, loader: str = "fabric") -> Optional[Dict]:
     """Get the latest compatible mod version from Modrinth"""
     url = f"{MODRINTH_API_BASE}/project/{mod_slug}/version?loaders=%5B%22{loader}%22%5D&game_versions=%5B%22{mc_version}%22%5D"
@@ -131,7 +168,7 @@ MinecraftWinWidth=854
 OverrideCommands=false
 OverrideConsole=false
 OverrideGameTime=false
-OverrideJava=false
+OverrideJava=true
 OverrideJavaArgs=false
 OverrideJavaLocation=false
 OverrideMCLaunchMethod=false
@@ -280,6 +317,8 @@ def create_instance(mc_version: str, custom_mod_path: Optional[str] = None, copy
     if not config.get("multimc_instances_path") or not config.get("java_path"):
         print("Error: Set multimc_instances_path and java_path in config.json (see config.example.json).")
         sys.exit(1)
+
+    validate_java_runtime(config["java_path"], mc_version)
 
     print(f"\n=== Creating MultiMC Instance for Minecraft {mc_version} ===\n")
 

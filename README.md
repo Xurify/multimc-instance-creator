@@ -8,7 +8,7 @@ Creates Minecraft instances for **MultiMC** with **Fabric** loader and common mo
 
 - Python 3.7+
 - [MultiMC](https://multimc.org/) installed
-- Java (for `javaw.exe` path)
+- A Java runtime compatible with the target Minecraft version (set `java_path` to its `javaw.exe`; Minecraft 26.x needs Java 25+)
 
 ### Config
 
@@ -20,7 +20,7 @@ User-specific paths and options live in **config.json**. Do not commit it (it is
    ```
 2. Edit **config.json** and set:
    - **multimc_instances_path** – Where MultiMC stores instances (e.g. `C:\...\MultiMC\instances`). Required.
-   - **java_path** – Path to `javaw.exe` used to launch Minecraft (e.g. `C:/Program Files/Java/jdk-22/bin/javaw.exe`). Required.
+   - **java_path** – Path to `javaw.exe` used to launch Minecraft (e.g. `C:/path/to/jdk/bin/javaw.exe`). Required. The creator validates Java 25+ only for Minecraft 26.x.
    - **world_to_copy** – Name of the world save to copy into new instances (e.g. `"Test World"`). Set to `null` to disable. Optional.
    - **world_source_dir** – Optional. If set, the script copies the world from this folder instead of searching existing instances. Use `null` to search instances or use **templates/worlds/**.
 

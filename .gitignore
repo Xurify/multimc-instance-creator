@@ -3,3 +3,4 @@ templates/worlds/*/
 
 # User-specific paths and world name (copy from config.example.json; do not commit)
 config.json
+__pycache__/
